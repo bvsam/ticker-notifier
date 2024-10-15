@@ -31,7 +31,7 @@ def lambda_handler(event, context):
         alerts[ticker] = difference <= config_difference
 
     # Exit early if no tickers require notifying
-    if not any(list(alerts.values)):
+    if not any(list(alerts.values())):
         return {"statusCode": 200, "body": f"No emails needed to be sent!"}
 
     # Generating the email body
@@ -39,7 +39,7 @@ def lambda_handler(event, context):
 
     for ticker, should_alert in alerts.items():
         if should_alert:
-            body_text += f"- {ticker}: {differences[ticker]:.2f}% (threshold {ticker_config[ticker]:.2f}%)\n"
+            body_text += f"- {ticker}: {differences[ticker]*100:.2f}% (threshold {ticker_config[ticker]:.2f}%)\n"
 
     # Create a new SES client
     ses_client = boto3.client("ses", region_name=os.environ["REGION"])

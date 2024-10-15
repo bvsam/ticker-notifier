@@ -9,7 +9,7 @@ An AWS EventBridge chron job that triggers a Lambda function to send an email no
 1. Install the dependencies required for the lambda function. These dependencies must be installed for the `manylinux2014_x86_64` architecture to `src/lambda/` to allow for the `src/lambda/` directory to be zipped and run as a AWS Lambda function.
 
 ```
-pip install -r requirements.txt --platform manylinux2014_x86_64 -t src/lambda/
+pip install -r requirements.txt --platform manylinux2014_x86_64 -t src/lambda/ --only-binary=:all:
 ```
 
 2. Create a `.tfvars` file at `src/main.tfvars`. Fill out the `.tfvars` file with all the required variables, which can be seen in `main.tf`. An example of what a `main.tfvars` file might look like is provided below.

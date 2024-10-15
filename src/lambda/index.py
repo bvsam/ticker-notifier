@@ -33,6 +33,7 @@ def lambda_handler(event, context):
 
     # Exit early if no tickers require notifying
     if not any(list(alerts.values())):
+        print("No emails needed to be sent!")
         return {"statusCode": 200, "body": f"No emails needed to be sent!"}
 
     # Generating the email body
@@ -72,4 +73,5 @@ def lambda_handler(event, context):
         print(f"Error sending email: {e}")
         return {"statusCode": 500, "body": f"Failed to send SES email! Error: {e}"}
 
+    print("Successfully sent emails to recipients!")
     return {"statusCode": 200, "body": f"Email sent to {recipient_emails}!"}

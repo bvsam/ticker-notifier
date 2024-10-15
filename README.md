@@ -12,6 +12,12 @@ An AWS EventBridge chron job that triggers a Lambda function to send an email no
 pip install -r requirements.txt --platform manylinux2014_x86_64 -t src/lambda/ --only-binary=:all:
 ```
 
+If you run into an error running the command above, run the command below on an Ubuntu 22.04 system (this can be done by running a Docker container with a bind mount).
+
+```
+pip install -r requirements.txt -t src/lambda/
+```
+
 2. Create a `.tfvars` file at `src/main.tfvars`. Fill out the `.tfvars` file with all the required variables, which can be seen in `main.tf`. An example of what a `main.tfvars` file might look like is provided below.
 
 ```

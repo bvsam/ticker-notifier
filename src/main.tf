@@ -19,6 +19,10 @@ provider "aws" {
 # Input variable definitions
 ################################################################################
 
+variable "deployment_name" {
+  type = string
+}
+
 variable "region" {
   type = string
 }
@@ -40,8 +44,8 @@ variable "eventbridge_schedule_expression" {
 # Resource definitions
 ################################################################################
 
-resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_ses_exec_role"
+resource "aws_iam_role" "iam_role_lambda" {
+  name = "${var.deployment_name}-lambda-iam-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -58,7 +62,7 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 resource "aws_iam_policy" "ses_policy" {
-  name        = "ses_policy"
+  name        = "${var.deployment_name}-ses-policy"
   description = "A policy to allow Lambda to send emails using SES"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -75,14 +79,14 @@ resource "aws_iam_policy" "ses_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "attach_ses_policy" {
+resource "aws_iam_role_policy_attachment" "ses_policy_attachment" {
   policy_arn = aws_iam_policy.ses_policy.arn
-  role       = aws_iam_role.lambda_exec_role.name
+  role       = aws_iam_role.iam_role_lambda.name
 }
 
 resource "aws_iam_role_policy_attachment" "basic_execution_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_exec_role.name
+  role       = aws_iam_role.iam_role_lambda.name
 }
 
 data "archive_file" "lambda_inline_zip" {
@@ -92,12 +96,13 @@ data "archive_file" "lambda_inline_zip" {
 }
 
 resource "aws_lambda_function" "ses_email_function" {
-  function_name = "ses_email_function"
-  role          = aws_iam_role.lambda_exec_role.arn
+  function_name = "${var.deployment_name}-function"
+  description   = "A function that uses SES to send emails to specified recipients when logic has been triggered."
+  role          = aws_iam_role.iam_role_lambda.arn
 
   timeout          = 60
   runtime          = "python3.10"
-  handler          = "lambda.lambda_handler"
+  handler          = "index.lambda_handler"
   filename         = data.archive_file.lambda_inline_zip.output_path
   source_code_hash = data.archive_file.lambda_inline_zip.output_base64sha256
 
@@ -118,7 +123,7 @@ resource "aws_cloudwatch_log_group" "lambda_log" {
 
 # EventBridge Rule to trigger the Lambda function
 resource "aws_cloudwatch_event_rule" "chron_schedule" {
-  name                = "trigger_lambda_chron_schedule"
+  name                = "${var.deployment_name}-trigger-lambda-chron-schedule"
   schedule_expression = var.eventbridge_schedule_expression
 }
 
@@ -134,7 +139,6 @@ resource "aws_lambda_permission" "eventbridge_lambda" {
 
 # EventBridge Target to trigger the Lambda function
 resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.chron_schedule.name
-  target_id = "lambda_target"
-  arn       = aws_lambda_function.ses_email_function.arn
+  rule = aws_cloudwatch_event_rule.chron_schedule.name
+  arn  = aws_lambda_function.ses_email_function.arn
 }

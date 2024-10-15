@@ -8,7 +8,7 @@ import yfinance as yf
 
 def lambda_handler(event, context):
     # Determine which tickers require notifying
-    config_fname = "example_config.yaml"
+    config_fname = "config.yaml"
     with open(config_fname) as f:
         try:
             config = yaml.safe_load(f)

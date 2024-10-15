@@ -26,8 +26,9 @@ Ensure that the `sender_email` is a verified email address and that the `recipie
 
 3. Create a YAML config file for the Lambda function at `src/lambda/config.yaml`. Fill out the config file with valid configuration (an example is provided at `src/lambda/example_config.yaml`).
 
-4. Apply the terraform code. Within the `src/` directory, run the following:
+4. Initialize terraform and apply the terraform code. Within the `src/` directory, run the following:
 
 ```
+terraform init
 terraform apply --var-file=main.tfvars
 ```

@@ -80,6 +80,11 @@ resource "aws_iam_role_policy_attachment" "attach_ses_policy" {
   role       = aws_iam_role.lambda_exec_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "basic_execution_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.lambda_exec_role.name
+}
+
 data "archive_file" "lambda_inline_zip" {
   type        = "zip"
   output_path = "/tmp/lambda_zip_inline.zip"
@@ -103,6 +108,12 @@ resource "aws_lambda_function" "ses_email_function" {
       RECIPIENT_EMAILS = var.recipient_emails
     }
   }
+}
+
+resource "aws_cloudwatch_log_group" "lambda_log" {
+  name = "/aws/lambda/${aws_lambda_function.ses_email_function.function_name}"
+
+  retention_in_days = 30
 }
 
 # EventBridge Rule to trigger the Lambda function

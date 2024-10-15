@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import os
 
@@ -35,7 +36,7 @@ def lambda_handler(event, context):
         return {"statusCode": 200, "body": f"No emails needed to be sent!"}
 
     # Generating the email body
-    body_text = "The following tickers raised notifications:\n"
+    body_text = f"The following tickers raised notifications at {dt.datetime.now().astimezone().strftime('%Y-%m-%dT%H:%M:%S %z')}:\n"
 
     for ticker, should_alert in alerts.items():
         if should_alert:

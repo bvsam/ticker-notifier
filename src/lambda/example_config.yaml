@@ -2,4 +2,6 @@
 # as 100%)
 decimal: false
 tickers:
+  # Set a threshold to be notified when the ticker "SPY" is below 99% of the
+  # value of its 52 week high
   SPY: 99

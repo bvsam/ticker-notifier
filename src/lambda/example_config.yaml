@@ -1,6 +1,7 @@
-# Set `decimal` to true of ticker values are specified in decimal (i.e. with 1.0
+# Set `decimal` to true if ticker values are specified in decimal (i.e. with 1.0
 # as 100%)
 decimal: false
+# A list of `yfinance` (Yahoo Finance) compatible tickers
 tickers:
   # Set a threshold to be notified when the ticker "SPY" is below 99% of the
   # value of its 52 week high

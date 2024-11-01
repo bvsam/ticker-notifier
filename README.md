@@ -36,5 +36,6 @@ Ensure that the `sender_email` is a verified email address and that the `recipie
 
 ```
 terraform init
+# Optional: `terraform plan --var-file=main.tfvars`
 terraform apply --var-file=main.tfvars
 ```

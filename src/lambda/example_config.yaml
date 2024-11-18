@@ -1,6 +1,9 @@
 # Set `decimal` to true if ticker values are specified in decimal (i.e. with 1.0
 # as 100%)
 decimal: false
+# Set `use_close_high` to true to use the high of the closing prices within the
+# last year instead of the absolute high over the last year
+use_close_high: true
 # A list of `yfinance` (Yahoo Finance) compatible tickers
 tickers:
   # Set a threshold to be notified when the ticker "SPY" is below 99% of the

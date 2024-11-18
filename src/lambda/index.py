@@ -2,7 +2,7 @@ import datetime as dt
 import json
 import os
 
-import boto3
+import boto3  # type: ignore
 import yaml
 import yfinance as yf
 
@@ -19,12 +19,18 @@ def lambda_handler(event, context):
 
     is_decimal = config["decimal"]
     ticker_config = config["tickers"]
+    use_close_high = config["use_close_high"]
 
     differences = {}
     alerts = {}
     for ticker in ticker_config.keys():
-        t = yf.Ticker(ticker)
-        difference = t.info["previousClose"] / t.info["fiftyTwoWeekHigh"]
+        y_ticker = yf.Ticker(ticker)
+        yearly_high = (
+            y_ticker.history(period="1y")["Close"].max()
+            if use_close_high
+            else y_ticker.info["fiftyTwoWeekHigh"]
+        )
+        difference = y_ticker.info["previousClose"] / yearly_high
         differences[ticker] = difference
         config_difference = ticker_config[ticker]
         if not is_decimal:

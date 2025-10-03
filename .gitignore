@@ -1,6 +1,7 @@
 .venv
 __pycache__
 src/lambda/config.yaml
+layers/
 
 .vscode
 

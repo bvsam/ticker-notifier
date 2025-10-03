@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.71.0"
+      version = "~> 5.72.0"
     }
     archive = {
       source  = "hashicorp/archive"
@@ -89,6 +89,34 @@ resource "aws_iam_role_policy_attachment" "basic_execution_policy_attachment" {
   role       = aws_iam_role.iam_role_lambda.name
 }
 
+data "archive_file" "layer1" {
+  type        = "zip"
+  source_dir  = "${path.module}/../layers/layer1"
+  output_path = "/tmp/layer1.zip"
+}
+
+resource "aws_lambda_layer_version" "layer1" {
+  layer_name          = "${var.deployment_name}-deps1"
+  compatible_runtimes = ["python3.10"]
+
+  filename         = data.archive_file.layer1.output_path
+  source_code_hash = data.archive_file.layer1.output_base64sha256
+}
+
+data "archive_file" "layer2" {
+  type        = "zip"
+  source_dir  = "${path.module}/../layers/layer2"
+  output_path = "/tmp/layer2.zip"
+}
+
+resource "aws_lambda_layer_version" "layer2" {
+  layer_name          = "${var.deployment_name}-deps2"
+  compatible_runtimes = ["python3.10"]
+
+  filename         = data.archive_file.layer2.output_path
+  source_code_hash = data.archive_file.layer2.output_base64sha256
+}
+
 data "archive_file" "lambda_inline_zip" {
   type        = "zip"
   output_path = "/tmp/lambda_zip_inline.zip"
@@ -105,6 +133,11 @@ resource "aws_lambda_function" "ses_email_function" {
   handler          = "index.lambda_handler"
   filename         = data.archive_file.lambda_inline_zip.output_path
   source_code_hash = data.archive_file.lambda_inline_zip.output_base64sha256
+
+  layers = [
+    aws_lambda_layer_version.layer1.arn,
+    aws_lambda_layer_version.layer2.arn
+  ]
 
   environment {
     variables = {

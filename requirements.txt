@@ -1,2 +1,2 @@
-yfinance==0.2.42
+yfinance==0.2.66
 PyYAML==6.0.2

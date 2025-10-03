@@ -2,4 +2,4 @@ deployment_name = "ticker-notifier"
 region = "us-east-1"
 sender_email = "name@example.com"
 recipient_emails = "[\"name@example.com\"]"
-eventbridge_schedule_expression = "rate(1 day)"
+eventbridge_schedule_expression = "rate(1 day)" # Or "cron(0 16 ? * 2 *)" to run every Monday at 16:00 UTC
